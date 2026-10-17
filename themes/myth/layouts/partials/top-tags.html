@@ -1,0 +1,30 @@
+{{- /* Bottom-of-homepage tag cloud. Counts every tag across all posts,
+       drops the per-post ordinals (verse-14, day-6) which nobody browses by,
+       then takes the 10 most-used. Capped at 10, so it shows fewer if there
+       are fewer real topic tags. */ -}}
+{{- $counts := newScratch -}}
+{{- range site.RegularPages -}}
+  {{- range .Params.tags -}}
+    {{- $counts.Set . (add ($counts.Get . | default 0) 1) -}}
+  {{- end -}}
+{{- end -}}
+{{- $tags := slice -}}
+{{- range $tag, $n := $counts.Values -}}
+  {{- if not (findRE `^(verse|day)-` $tag) -}}
+    {{- $tags = $tags | append (dict "tag" $tag "count" $n) -}}
+  {{- end -}}
+{{- end -}}
+{{- with $tags }}
+<section class="wrap top-tags">
+  <h2 class="section-heading"><span>Browse by tag</span></h2>
+  <ul class="tag-cloud">
+    {{- range sort . "count" "desc" | first 10 }}
+    <li><a class="tag-chip" href="{{ printf "/tags/%s/" .tag | relURL }}">
+      <span class="tag-name">{{ .tag }}</span>
+      <span class="tag-count">{{ .count }}</span>
+    </a></li>
+    {{- end }}
+  </ul>
+  <p class="tag-cloud-more"><a href="{{ "tags/" | relURL }}">All tags →</a></p>
+</section>
+{{- end -}}

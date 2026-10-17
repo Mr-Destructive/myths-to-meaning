@@ -1,0 +1,75 @@
+name: Sync from Substack
+
+on:
+  schedule:
+    # 04:17 UTC daily. Off-peak and deliberately off the hour -- GitHub delays
+    # cron jobs that fire on :00 because of load, and we do not care about the
+    # exact minute, only that it runs once a day.
+    - cron: "17 4 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-substack
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          # Full history: the sync script diffs against committed content, and
+          # a shallow clone can leave us with a tree that is not HEAD.
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq pandoc
+          pip install beautifulsoup4
+
+      - name: Check for new posts
+        id: sync
+        run: |
+          python3 scripts/sync_rss.py | tee sync.log
+          # Surface the result in the run summary for humans.
+          if [ -f data/sync-report.json ]; then
+            {
+              echo "## Substack sync"
+              echo '```json'
+              cat data/sync-report.json
+              echo '```'
+              NEEDS=$(python3 -c "import json;print(', '.join(json.load(open('data/sync-report.json'))['needs_editorial']))")
+              if [ -n "$NEEDS" ]; then
+                echo ""
+                echo ":warning: **$NEEDS** -- new section(s) need a \`glyph\` and \`blurb\` in their \`_index.md\`."
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Commit new posts
+        run: |
+          if [ -z "$(git status --porcelain -- content/)" ]; then
+            echo "No content changes."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          # No [skip ci] here on purpose: this push must reach the
+          # build-deploy workflow, otherwise a newly synced post would land in
+          # the repo but never publish. build-deploy does not push back, so
+          # there is no loop.
+          COUNT=$(git status --porcelain -- content/ | wc -l)
+          SECTIONS=$(python3 -c "import json;print(', '.join(json.load(open('data/sync-report.json'))['sections']))" 2>/dev/null || echo "content")
+          git add content/
+          git commit -m "content: sync $COUNT new post(s) from Substack ($SECTIONS)"
+          git push

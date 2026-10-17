@@ -1,0 +1,219 @@
+<!doctype html><html lang="en-in"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shiv Tandav Stotram: Verse 1 — design preview</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Tiro+Devanagari+Hindi:ital@0;1&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Yatra+One&family=Rozha+One&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ivory:#fbf5e6;--ivory-edge:#f0e4c8;--ink:#2a2118;--ink-soft:#5a4a38;
+--ink-faint:#8b7860;--ruby:#9e1b32;--peacock:#0f6b6b;--gold:#b8912f;--plum:#4a1540;
+--rule:rgba(74,21,64,.22);--rule-soft:rgba(42,33,24,.12);
+--serif:"Cormorant Garamond",Georgia,serif;--display:"Rozha One",serif;--deva:"Tiro Devanagari Hindi",serif;}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--ivory-edge);color:var(--ink);font-family:var(--serif);
+font-size:1.2rem;line-height:1.72;position:relative}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+background:radial-gradient(ellipse 70% 60% at 50% 0%,rgba(255,252,240,.9),transparent 65%),
+linear-gradient(180deg,#f6ecd6,var(--ivory) 20%,#f4ead2 100%)}
+.grain{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.4;
+mix-blend-mode:multiply;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E")}
+/* painted folio frame */
+.frame{position:fixed;inset:14px;z-index:1;pointer-events:none;
+border:2px solid var(--ruby);border-radius:2px;
+box-shadow:inset 0 0 0 1px var(--ivory),inset 0 0 0 4px var(--gold),
+inset 0 0 0 5px var(--ivory),inset 0 0 0 6px var(--peacock)}
+.wrap{width:min(100% - 2*2.4rem,70rem);margin-inline:auto;position:relative;z-index:2}
+.site-header{border-bottom:1px solid var(--rule);text-align:center;padding:2.2rem 0 1.4rem}
+.brand{display:inline-flex;flex-direction:column;align-items:center;gap:.4rem;
+text-decoration:none;color:inherit;margin-bottom:1.2rem}
+.brand-mark{font-family:var(--deva);font-size:2.6rem;color:var(--ruby)}
+.brand-name{font-family:var(--display);font-size:2rem;color:var(--plum);letter-spacing:.02em}
+.brand-sub{font-size:.68rem;letter-spacing:.3em;text-transform:uppercase;color:var(--ink-faint)}
+.site-nav{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap}
+.site-nav a{text-decoration:none;color:var(--ink-soft);font-family:var(--serif);
+font-size:1.05rem;letter-spacing:.06em;padding-bottom:.2rem;border-bottom:1px solid transparent;
+font-variant:small-caps}
+.site-nav a.active{color:var(--ruby);border-bottom-color:var(--gold)}
+.hero{text-align:center;padding:3rem 0 1.5rem}
+.hero-eyebrow{font-family:var(--deva);color:var(--peacock);font-size:1.35rem;margin:0 0 .6rem}
+.hero-title{font-family:var(--display);font-size:clamp(2.4rem,6.5vw,3.9rem);margin:0;color:var(--plum)}
+.hero-sub{max-width:34rem;margin:1rem auto 0;color:var(--ink-soft);font-style:italic;font-size:1.15rem}
+.ornament{color:var(--gold);letter-spacing:.5em;margin:1.4rem 0 0;font-size:1rem}
+.series-grid{display:grid;gap:1.8rem;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));margin-top:2rem}
+.card{position:relative;display:block;text-decoration:none;color:inherit;padding:2.4rem 1.8rem 1.8rem;
+background:linear-gradient(160deg,rgba(255,252,240,.85),rgba(240,228,200,.5));
+border:1px solid var(--gold);box-shadow:0 2px 0 rgba(74,21,64,.1),0 14px 30px -22px rgba(42,33,24,.6);
+transition:transform .22s,box-shadow .22s;overflow:hidden}
+.card::before{content:"";position:absolute;inset:10px;border:1px solid var(--rule-soft);pointer-events:none}
+.card::after{content:"";position:absolute;inset:14px;border:3px solid transparent;
+border-image:linear-gradient(135deg,var(--ruby),var(--gold),var(--peacock)) 1;opacity:0;transition:opacity .22s}
+.card:hover{transform:translateY(-4px);box-shadow:0 5px 0 rgba(74,21,64,.15),0 22px 40px -22px rgba(42,33,24,.7)}
+.card:hover::after{opacity:1}
+.card-glyph{font-family:var(--deva);display:block;font-size:2.9rem;color:var(--ruby);margin-bottom:.5rem}
+.card-title{font-family:var(--display);font-size:1.5rem;margin:0 0 .5rem;color:var(--plum)}
+.card-blurb{margin:0 0 1.1rem;font-size:1.02rem;color:var(--ink-soft)}
+.card-meta{font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--peacock);font-weight:600}
+.article{padding:3rem 0}
+.article-head{max-width:38rem;margin-inline:auto;padding-bottom:1.8rem;text-align:center}
+.eyebrow{display:inline-block;text-decoration:none;font-family:var(--serif);font-variant:small-caps;
+font-size:.98rem;letter-spacing:.14em;color:var(--ruby);margin-bottom:.8rem}
+.article-title{font-family:var(--display);font-size:clamp(1.9rem,5vw,3rem);margin:0;color:var(--plum);line-height:1.15}
+.article-sub{margin:1rem auto 0;max-width:33rem;color:var(--ink-soft);font-style:italic;font-size:1.15rem}
+.article-date{display:block;margin-top:1rem;font-size:.88rem;color:var(--ink-faint);letter-spacing:.1em;font-variant:small-caps}
+.prose{max-width:38rem;margin-inline:auto}
+.prose>*+*{margin-top:1.25em}
+.prose h2{font-family:var(--display);font-size:1.7rem;color:var(--ruby);margin-top:3rem;
+padding-top:1.3rem;border-top:1px solid var(--rule)}
+.prose h2::after{content:" ❖";color:var(--gold)}
+.prose a{color:var(--peacock);text-decoration-color:rgba(15,107,107,.4)}
+.prose strong{color:var(--plum)}
+.prose ul{padding-left:1.5rem}.prose li+li{margin-top:.5rem}.prose li::marker{color:var(--ruby)}
+.prose blockquote{margin:2rem 0;padding:1.5rem 1.7rem;
+background:linear-gradient(135deg,rgba(255,252,240,.8),rgba(240,228,200,.4));
+border:1px solid var(--gold);border-left:4px solid var(--ruby);position:relative}
+.prose blockquote::before{content:"❝";position:absolute;top:-.2rem;left:1rem;
+font-size:2.5rem;color:var(--gold);opacity:.5;font-family:var(--serif)}
+.prose blockquote strong{font-family:var(--deva);color:var(--plum)}
+.prose hr{border:0;height:1px;margin:2.8rem auto;width:65%;
+background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.series-nav{display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:center;
+max-width:38rem;margin:3.5rem auto 1rem;padding-top:1.8rem;border-top:1px solid var(--rule)}
+.sn-link{text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:.2rem}
+.sn-next{text-align:right}
+.sn-dir{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--ruby)}
+.sn-title{font-family:var(--display);font-size:1.05rem;color:var(--plum)}
+.sn-empty{visibility:hidden}
+.sn-index{text-decoration:none;font-variant:small-caps;font-size:.9rem;letter-spacing:.1em;
+color:var(--ink-faint);border:1px solid var(--gold);padding:.5rem .9rem;white-space:nowrap}
+.site-footer{margin-top:4.5rem;padding:2.8rem 0;border-top:2px solid var(--ruby);text-align:center;
+background:linear-gradient(180deg,transparent,rgba(74,21,64,.05))}
+.foot-ornament{color:var(--gold);font-size:1.6rem;margin-bottom:.7rem;letter-spacing:.4em}
+.foot-note{margin:0 0 .5rem;color:var(--ink-soft);font-style:italic;font-size:1.05rem}
+.foot-copy{margin:0;font-size:.8rem;color:var(--ink-faint)}
+</style></head><body><div class="grain" aria-hidden="true"></div>
+<header class="site-header"><div class="wrap">
+  <a class="brand" href="#"><span class="brand-mark">ॐ</span>
+  <span class="brand-text"><span class="brand-name">Mythology to Meaning</span>
+  <span class="brand-sub">Stotras · Verses · Reflections</span></span></a>
+  <nav class="site-nav"><a href="#">Home</a><a href="#" class="active">Shiv Tandav</a>
+  <a href="#">Mahishasura Mardini</a><a href="#">Navratri</a></nav>
+</div></header>
+
+<main>
+<section class="hero"><div class="wrap">
+  <p class="hero-eyebrow">॥ जय माँ ॥</p>
+  <h1 class="hero-title">Mythology to Meaning</h1>
+  <p class="hero-sub">A journey through the vibrant tapestry of Hindu mythology and literature.</p>
+</div></section>
+
+<section class="wrap series-grid">
+<a class="card" href="#"><span class="card-glyph">शिव</span><h2 class="card-title">Shiv Tandav Stotram</h2><p class="card-blurb">17 verses on Shiva's cosmic dance — literal, mythological and spiritual readings.</p><span class="card-meta">17 parts →</span></a>
+<a class="card" href="#"><span class="card-glyph">दुर्गा</span><h2 class="card-title">Mahishasura Mardini</h2><p class="card-blurb">The 21-verse hymn to the Goddess who slew Mahishasura, verse by verse.</p><span class="card-meta">22 parts →</span></a>
+<a class="card" href="#"><span class="card-glyph">नवरात्रि</span><h2 class="card-title">Navratri</h2><p class="card-blurb">Nine nights, three years — one form of Maa a day, and the meaning she carries.</p><span class="card-meta">24 parts →</span></a>
+</section>
+
+<article class="wrap article">
+  <header class="article-head">
+    <a class="eyebrow" href="#">Shiv Tandav Stotram · Verse 1</a>
+    <h1 class="article-title">Shiv Tandav Stotram: Verse 1</h1>
+    <p class="article-sub">Exploring and understanding the meaning of the first verse in the Shiv Tandav Stotram in detail, the spiritual and mythological meaning</p>
+    <time class="article-date">4 November 2024</time>
+  </header>
+  <div class="prose"><h2 id="shiv-tandav-stotram">Shiv Tandav Stotram</h2>
+<p>The <a href="https://en.wikipedia.org/wiki/Shiva_Tandava_Stotra">Shiv Tandav Stotram</a> is a powerful hymn dedicated to Lord Shiva, celebrating his cosmic dance, the Tandava. It is suspected to be composed by Ravana (not proven though), and it expresses awe for Shiva’s divine qualities, strength, and the profound energy of his dance, which symbolizes creation, preservation, and destruction. The storm serves as a prayer for spiritual awakening, invoking blessings of purity, power, and auspiciousness.</p>
+<p>There are a total of <a href="https://hindi.webdunia.com/aarti-chalisa/shiv-tandav-stotram-114100100059_1.html">17 verses</a> in the stotram. We will be exploring each verse separately and understanding its interpretation literally, mythologically as well as spiritually.</p>
+<p>However, people might call it a destructive act but as with anything in the world, it depends on how you perceive it. If you take it positively it is a great source of inspiration and a heartful praise sung by the author (whoever it may be).</p>
+<hr />
+<h2 id="verse-1">Verse 1</h2>
+<blockquote>
+<p><strong>जटाटवीगलज्जलप्रवाहपावितस्थले<br />
+गलेऽवलम्ब्य लम्बितां भुजङ्गतुङ्गमालिकाम् ।<br />
+डमड्डमड्डमड्डमन्निनादवड्डमर्वयं<br />
+चकार चण्डताण्डवं तनोतु नः शिवः शिवम् ॥</strong></p>
+<p>Jata-tavi-Galajalla-Pravaha-Pavitas-Thale<br />
+Gale-Valambya Lambitam Bhujanga-Tunga-Malikam</p>
+<p>Damad-Damad-Damad-Damana-Nida-Vada-Marvyam<br />
+Chakara Chanda-Tandavam Tano-Tu Naha Shivaha Shivam</p>
+</blockquote>
+<hr />
+<h2 id="meaning">Meaning</h2>
+<p>From Lord Shiva’s matted locks of hair flows a purifying stream of water (Ganga), and a serpent hangs on his neck like a lofty garland.</p>
+<p>His damru creates a damad-damad-damad-like resonating and intensified sound. Lord Shiva is performing a fierce and passionate dance (Tandav), may the auspicious Lord Shiva extend the blessings to us.</p>
+<hr />
+<h2 id="word-by-word-meaning">Word by Word Meaning</h2>
+<blockquote>
+<p><strong>जटाटवीगलज्जलप्रवाहपावितस्थले गलेऽवलम्ब्य लम्बितां भुजङ्गतुङ्गमालिकाम्</strong></p>
+<p>Jata-tavi-Galajalla-Pravaha-Pavitas-Thale<br />
+Gale-Valambya Lambitam Bhujanga-Tunga-Malikam</p>
+</blockquote>
+<p>From Lord Shiva’s matted locks of hair flows a purifying stream of water (Ganga), and a serpent hangs on his neck like a lofty garland.</p>
+<ul>
+<li><p><strong>जटाटवीगलज्जलप्रवाहपावितस्थले (Jatatavi-Galajjala-Pravaha-Paavita-Sthale):</strong></p>
+<ul>
+<li><p>जटाटवी (Jatatavi): the matted locks of hair</p></li>
+<li><p>गलज्जल (Galajjala): flowing water</p></li>
+<li><p>प्रवाह (Pravaaha): stream</p></li>
+<li><p>पावित (Paavita): purifying</p></li>
+<li><p>स्थले (Sthale): in the place</p></li>
+</ul></li>
+<li><p><strong>गलेऽवलम्ब्य (Gale-Avalambya):</strong></p>
+<ul>
+<li><p>गले (Gale): around the neck</p></li>
+<li><p>अवलम्ब्य (Avalambya): supporting</p></li>
+</ul></li>
+<li><p><strong>लम्बितां</strong> (<strong>Laambitaam</strong>): hanging</p></li>
+<li><p><strong>भुजङ्गतुङ्गमालिकाम् (Bhujana-Tunga-Maalikaam)</strong></p>
+<ul>
+<li><p><strong>भुजङ्ग</strong> (Bhujanga): serpent</p></li>
+<li><p><strong>तुङ्ग</strong> (Tunga): lofty</p></li>
+<li><p><strong>मालिकाम्</strong> (Maalikaam): garland</p></li>
+</ul></li>
+</ul>
+<blockquote>
+<p><strong>डमड्डमड्डमड्डमन्निनादवड्डमर्वयं चकार चण्डताण्डवं तनोतु नः शिवः शिवम्</strong></p>
+</blockquote>
+<p>His damru creates a damad-damad-damad-like resonating and intensified sound. Lord Shiva is performing a fierce and passionate dance of Tandav, may the auspicious Lord Shiva extend the blessings to us.</p>
+<ul>
+<li><p><strong>डमड्डमड्डमड्डमन्निनादवड्डमर्वयंचकार (Damad-Damad-Damad-Dam-Ninada-Vaddam-Arvyam):</strong> The damad-damad-damad like intensified and resonating sound/music is created from his playing of damru</p>
+<ul>
+<li><p>डमड्डमड्डमड्डम् (Damad-Damad-Damad-Dam): the sound of drums</p></li>
+<li><p>निनाद (Ninada): resonating sound</p></li>
+<li><p>वड्डम् (Vaddam): intensely or loudly</p></li>
+<li><p>अर्वय (Arvayam): creating</p></li>
+</ul></li>
+<li><p><strong>चकार</strong> (<strong>Chakara</strong>): <strong>Performed</strong></p></li>
+<li><p><strong>चण्डताण्डवं (Chanda-Taandavam): Fierce dance (Tandava)</strong></p></li>
+<li><p><strong>तनोतु (Tanotu): May it extend</strong></p></li>
+<li><p><strong>नः (Naha): For us</strong></p></li>
+<li><p><strong>शिवः (Shivaha): Lord Shiva</strong></p></li>
+<li><p><strong>शिवम् (Shivam): Auspiciousness</strong></p></li>
+</ul>
+<hr />
+<h2 id="mythological-meaning">Mythological Meaning</h2>
+<ul>
+<li><p><strong>Jata (</strong>Matted Hair<strong>)</strong>: In Hindu mythology, Lord Shiva is often depicted as a yogi, emphasizing the importance of meditation and inner peace. Shiva’s matted locks symbolize his ascetic nature and detachment from worldly life.</p></li>
+<li><p><strong>Ganga (</strong>Flowing Water<strong>)</strong>: The purifying stream of water represents the sacred river Ganga, which is believed to flow from Shiva’s hair. It symbolizes purity, cleansing, and the flow of divine grace. Ganga is revered as a goddess in her own right, embodying the life-giving and purifying qualities of water. It shows how much power and humility are required in holding the sacred stream of Ganga whose force is impossible to withstand for mother earth.</p></li>
+<li><p><strong>Tandava (</strong>Fierce and passionate dance): Tandava is a vigorous dance that signifies creation, preservation, and destruction—key aspects of the cosmic cycle. This dance is not just physical; it reflects the emotional and spiritual aspects of life, portraying Shiva as the ultimate force of nature and transformation. The fierce nature of the dance indicates Shiva’s role as a destroyer of ignorance and illusion, paving the way for new creation.</p></li>
+</ul>
+<hr />
+<h2 id="spiritual-meaning">Spiritual Meaning</h2>
+<ul>
+<li><p>Shiva’s matted hair and the purifying flow of the Ganga symbolize the journey toward inner peace and transcendence. It suggests that through detachment from material desires and by seeking inner stillness (represented by the flowing water), one can attain spiritual purity and clarity.</p></li>
+<li><p>The serpent around Shiva’s neck represents transformation. Shiva’s dance converts destructive energy into creative power. This teaches us to channel our energies constructively, to transform negative thoughts, emotions, and experiences into opportunities for growth, learning, and self-improvement.</p></li>
+<li><p>The verse somehow also manages to teach us the importance of music and dance in our life, the transformative and divine connection and power in them. To embrace true devotion and harmony, sheer enjoyment, and getting involved, one with the energy is the indication from this verse.</p></li>
+</ul>
+<hr />
+
+</div>
+  <nav class="series-nav">
+    <span class="sn-link sn-empty"></span>
+    <a class="sn-index" href="#">All 17</a>
+    <a class="sn-link sn-next" href="#"><span class="sn-dir">Next →</span>
+    <span class="sn-title">Verse 2</span></a>
+  </nav>
+</article>
+</main>
+
+<footer class="site-footer"><div class="wrap">
+  <div class="foot-ornament">❊</div>
+  <p class="foot-note">Ported with reverence from Mythology to Meaning.</p>
+  <p class="foot-copy">© 2026 Meet</p>
+</div></footer>
+</body></html>

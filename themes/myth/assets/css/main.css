@@ -1,0 +1,384 @@
+/* ==========================================================================
+   Mythology to Meaning — "Torn Manuscript · Pattachitra" (design 6)
+   A torn sheet of aged palm-paper lying on sun-warmed wood, inked in the
+   bold black-outline folk language of Pattachitra painting.
+   ========================================================================== */
+
+:root {
+  --table:  #cfb789;   /* sun-warmed wood under the sheet */
+  --paper:  #f7ecd0;   /* the sheet itself */
+  --card:   #fdf6e2;   /* painted panels */
+  --tint:   #e8b74a;   /* saffron / turmeric */
+  --ink:    #1b1208;   /* the outline black */
+  --ink-soft: #473117;
+  --red:    #c62828;   /* sindoor red */
+  --green:  #2e6b3e;   /* leaf green */
+  --serif:  "Spectral", Georgia, serif;
+  --display:"Yatra One", cursive;
+  --deva:   "Tiro Devanagari Hindi", serif;
+  --measure: 41rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { overflow-x: clip; }
+
+body {
+  margin: 0; min-height: 100vh;
+  background: var(--table); color: var(--ink);
+  font-family: var(--serif); font-size: 1.1rem; line-height: 1.7;
+  position: relative; overflow-x: clip;
+}
+
+/* ---------- The table under the sheet ------------------------------- */
+body::before {
+  content: ""; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(93deg, rgba(110,75,35,.07) 0 4px, transparent 4px 11px),
+    radial-gradient(ellipse 85% 65% at 50% 6%, rgba(255,252,240,.85), transparent 72%),
+    linear-gradient(158deg, #dcc79b, #cfb789 60%, #c4aa7a);
+}
+
+/* ---------- The sheet: edges torn by the SVG displacement filter ------ */
+.sheet {
+  position: absolute; inset: 92px 16px 24px 16px; z-index: 1; pointer-events: none;
+  filter: url(#torn-paper) drop-shadow(0 16px 30px rgba(0,0,0,.35))
+          drop-shadow(0 3px 5px rgba(0,0,0,.25));
+  background:
+    radial-gradient(circle at 11% 22%, rgba(150,96,40,.22) 0 8px, transparent 17px),
+    radial-gradient(circle at 85% 15%, rgba(140,88,36,.17) 0 12px, transparent 27px),
+    radial-gradient(circle at 67% 79%, rgba(150,96,40,.19) 0 10px, transparent 23px),
+    radial-gradient(circle at 24% 87%, rgba(120,74,30,.15) 0 14px, transparent 31px),
+    radial-gradient(circle at 47% 44%, rgba(163,113,50,.11) 0 22px, transparent 50px),
+    radial-gradient(circle at 90% 58%, rgba(140,88,36,.13) 0 9px, transparent 21px),
+    repeating-linear-gradient(0deg, rgba(120,86,40,.04) 0 1px, transparent 1px 4px),
+    linear-gradient(157deg, #fbf2d9, #f3e2bd 44%, #dfc795);
+}
+/* uneven aging toward the edges */
+.sheet::after {
+  content: ""; position: absolute; inset: 0; mix-blend-mode: multiply;
+  background: radial-gradient(ellipse 125% 115% at 50% 45%, transparent 52%, rgba(124,82,34,.3));
+}
+
+/* ---------- Paper grain (noise over everything) ---------------------- */
+.grain {
+  position: fixed; inset: 0; z-index: 2; pointer-events: none; opacity: .6;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='.34'/%3E%3C/svg%3E");
+}
+
+/* ---------- Layout scaffolding --------------------------------------- */
+.wrap {
+  position: relative; z-index: 3;
+  width: min(100% - 5rem, 66rem); margin-inline: auto;
+}
+.site-header, main, .site-footer { position: relative; z-index: 3; }
+
+.skip-link {
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--red); color: var(--paper);
+  font-family: var(--display); font-size: .95rem;
+  padding: .6rem 1rem; border: 3px solid var(--ink);
+  text-decoration: none;
+}
+.skip-link:focus { left: 0; }
+
+/* ---------- Header -----------------------------------------------------
+   Solid chrome band ABOVE the torn sheet — the tear must never reach into
+   the nav row, so the sheet starts below this band. */
+.site-header {
+  position: sticky; top: 0; z-index: 20;
+  background: var(--table); padding-top: .85rem; border-bottom: none;
+}
+.site-header .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: .85rem 1.4rem; flex-wrap: wrap;
+  padding-bottom: .8rem; border-bottom: 3px solid var(--ink);
+}
+.brand { display: flex; align-items: center; gap: .8rem; text-decoration: none; color: inherit }
+.brand-mark { display: flex; align-items: center; flex: none }
+/* the publication's own logo, straight from the repo */
+.brand-mark img {
+  display: block; width: 2.9rem; height: 2.9rem;
+  border: 3px solid var(--ink); box-shadow: 3px 3px 0 var(--ink);
+}
+.brand-text { display: flex; flex-direction: column; line-height: 1.1 }
+.brand-name { font-family: var(--display); font-size: 1.45rem; color: var(--ink) }
+.brand-sub {
+  font-size: .62rem; letter-spacing: .24em; text-transform: uppercase;
+  color: var(--ink-soft); font-weight: 600;
+}
+.site-nav { display: flex; gap: clamp(.7rem, 2vw, 1.3rem); flex-wrap: wrap; align-items: center }
+.site-nav a {
+  text-decoration: none; color: var(--ink-soft);
+  font-family: var(--display); font-size: .95rem; letter-spacing: .02em;
+  padding-bottom: .15rem; border-bottom: 3px solid transparent;
+  transition: color .15s, border-color .15s;
+}
+.site-nav a:hover  { color: var(--red); border-bottom-color: var(--red) }
+.site-nav a.active { color: var(--red); border-bottom-color: var(--red) }
+
+/* ---------- Hero ------------------------------------------------------- */
+.hero { text-align: center; padding: 3.2rem 0 1.6rem }
+.hero-eyebrow {
+  font-family: var(--deva); color: var(--red); font-size: 1.5rem; margin: 0 0 .5rem;
+}
+.hero-title {
+  font-family: var(--display); font-size: clamp(2.3rem, 7vw, 4rem); margin: 0;
+  color: var(--ink); line-height: 1.05; text-shadow: 4px 4px 0 var(--tint);
+}
+.hero-sub { max-width: 31rem; margin: 1rem auto 0; color: var(--ink-soft); font-weight: 500 }
+
+/* ---------- Section headings ------------------------------------------ */
+.section-heading {
+  font-family: var(--display); text-align: center;
+  font-size: 1.35rem; color: var(--ink); letter-spacing: .06em;
+  margin: 3rem 0 1.6rem; display: flex; align-items: center; gap: 1rem;
+}
+.section-heading::before, .section-heading::after {
+  content: ""; flex: 1; height: 6px;
+  background: repeating-linear-gradient(90deg,
+    var(--red) 0 14px, var(--tint) 14px 28px, var(--green) 28px 42px);
+}
+
+/* ---------- Series cards ------------------------------------------------ */
+.series-grid {
+  display: grid; gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); margin-top: 1.4rem;
+}
+.card {
+  position: relative; display: block; text-decoration: none; color: inherit;
+  padding: 1.9rem 1.5rem 1.5rem;
+  background: var(--card); border: 3px solid var(--ink);
+  box-shadow: 6px 6px 0 var(--ink);
+  transition: transform .18s, box-shadow .18s; overflow: hidden;
+}
+/* folk colour strip along the panel head */
+.card::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 8px;
+  background: repeating-linear-gradient(90deg,
+    var(--red) 0 14px, var(--tint) 14px 28px, var(--green) 28px 42px);
+}
+.card:hover { transform: translate(-3px, -3px); box-shadow: 9px 9px 0 var(--red) }
+.card-glyph {
+  font-family: var(--deva); display: block; font-size: 2.7rem; color: var(--red);
+  margin: .6rem 0 .5rem; -webkit-text-stroke: 1px var(--ink);
+}
+.card-title { font-family: var(--display); font-size: 1.35rem; margin: 0 0 .5rem; color: var(--ink) }
+.card-blurb { margin: 0 0 1.1rem; font-size: .96rem; color: var(--ink-soft) }
+.card-meta {
+  display: inline-block; font-size: .74rem; letter-spacing: .14em;
+  text-transform: uppercase; font-weight: 700;
+  color: var(--paper); background: var(--red);
+  padding: .22rem .55rem; border: 2px solid var(--ink);
+}
+
+/* ---------- Tag chips (secondary browse layer) ------------------------- */
+.tag-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .5rem;
+  margin: 0 0 1.8rem; padding-bottom: 1.2rem; border-bottom: 3px solid var(--ink);
+}
+.tag-bar-label {
+  font-size: .66rem; letter-spacing: .2em; text-transform: uppercase;
+  font-weight: 700; color: var(--ink-soft); margin-right: .3rem;
+}
+.tag-chip {
+  display: inline-flex; align-items: center; gap: .45rem;
+  font-family: var(--display); font-size: .85rem; text-decoration: none;
+  color: var(--ink); background: var(--card);
+  border: 2px solid var(--ink); padding: .25rem .7rem;
+  box-shadow: 3px 3px 0 var(--ink);
+  transition: transform .15s, box-shadow .15s, color .15s;
+}
+.tag-chip:hover {
+  transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--red); color: var(--red);
+}
+.tag-count {
+  font-family: var(--serif); font-weight: 700; font-size: .68rem;
+  letter-spacing: .04em; color: var(--paper); background: var(--red);
+  border: 2px solid var(--ink); padding: 0 .4rem; line-height: 1.5;
+}
+/* /tags/ index page */
+.tag-index {
+  list-style: none; margin: 1.6rem 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: .8rem;
+}
+.tag-index .tag-chip { font-size: 1.05rem; padding: .5rem 1rem }
+
+/* homepage tag cloud */
+.top-tags { padding-bottom: 2rem }
+.tag-cloud {
+  list-style: none; margin: 1.6rem 0 0; padding: 0;
+  display: flex; flex-wrap: wrap; gap: .8rem;
+}
+.tag-cloud .tag-chip { font-size: .95rem; padding: .4rem .9rem }
+.tag-cloud-more { margin: 1.4rem 0 0; font-family: var(--display); font-size: .95rem }
+.tag-cloud-more a { color: var(--red); text-decoration: none }
+.tag-cloud-more a:hover { text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 4px }
+
+/* ---------- Post lists -------------------------------------------------- */
+.latest { padding-bottom: 2rem }
+.post-list { list-style: none; margin: 0; padding: 0 }
+.post-list li + li { border-top: 3px solid var(--ink) }
+.post-list a {
+  display: grid; gap: .15rem .9rem; grid-template-columns: 1fr auto;
+  padding: 1rem .6rem; text-decoration: none; color: inherit;
+  border-left: 6px solid transparent;
+  transition: background .18s, border-color .18s, padding-left .18s;
+}
+.post-list a:hover { background: rgba(232,183,74,.28); border-left-color: var(--red); padding-left: 1rem }
+.pl-series, .pl-part {
+  grid-column: 1 / -1; font-size: .7rem; letter-spacing: .2em;
+  text-transform: uppercase; color: var(--red); font-weight: 700;
+}
+.pl-title { font-family: var(--display); font-size: 1.1rem; color: var(--ink) }
+.pl-sub {
+  grid-column: 1 / 2; font-size: .9rem; color: var(--ink-soft); font-style: italic;
+}
+.pl-date {
+  grid-row: 1 / 3; grid-column: 2; align-self: center; font-size: .8rem;
+  color: var(--ink-soft); font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; white-space: nowrap;
+}
+.post-list li:not(:has(.pl-part)) .pl-date { grid-row: auto }
+
+/* ---------- Article / listing ------------------------------------------- */
+.article { padding: 2.4rem 0 }
+.listing-head, .article-head {
+  max-width: var(--measure); margin-inline: auto;
+  padding-bottom: 1.6rem; border-bottom: 4px double var(--ink); margin-bottom: 1.7rem;
+}
+.eyebrow {
+  display: inline-block; text-decoration: none; font-family: var(--display);
+  font-size: .88rem; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--red); margin-bottom: .7rem;
+}
+.eyebrow:hover { color: var(--ink) }
+.article-title, .listing-title {
+  font-family: var(--display); font-size: clamp(1.85rem, 5vw, 2.9rem);
+  margin: 0; color: var(--ink); line-height: 1.1;
+}
+.article-sub { margin: .85rem 0 0; color: var(--ink-soft); font-weight: 500; font-size: 1.06rem }
+.article-date {
+  display: block; margin-top: .85rem; font-size: .8rem; color: var(--ink-soft);
+  font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+}
+
+.cover { margin: 1.5rem 0; max-width: var(--measure); margin-inline: auto }
+.cover img {
+  width: 100%; height: auto;
+  border: 3px solid var(--ink); box-shadow: 6px 6px 0 var(--ink);
+}
+.listing-intro { margin-bottom: 1rem; margin-top: 0 }
+.year-group { margin-top: 2rem }
+.year-heading {
+  font-family: var(--display); font-size: 1.3rem; color: var(--red);
+  margin: 0 0 .4rem; letter-spacing: .05em;
+}
+.year-heading a { color: inherit; text-decoration: none }
+.year-heading a:hover { color: var(--ink) }
+
+/* ---------- Prose -------------------------------------------------------- */
+.prose { max-width: var(--measure); margin-inline: auto }
+.prose > * + * { margin-top: 1.2em }
+.prose h2 {
+  font-family: var(--display); font-size: 1.55rem; color: var(--ink);
+  margin-top: 2.5rem; padding: 0 0 .5rem; border-bottom: 3px solid var(--red);
+}
+.prose h3 { font-family: var(--display); color: var(--red); font-size: 1.18rem; margin-top: 1.8rem }
+.prose h4 { font-size: 1.02rem; color: var(--ink); margin-top: 1.4rem }
+.prose a {
+  color: var(--red); text-decoration: underline;
+  text-decoration-thickness: 2px; text-underline-offset: 3px;
+}
+.prose a:hover { color: var(--ink) }
+.prose strong { color: var(--red); font-weight: 700 }
+.prose em { color: var(--ink-soft) }
+
+.prose ul, .prose ol { padding-left: 1.35rem }
+.prose li + li { margin-top: .5rem }
+.prose li::marker { color: var(--red); font-size: 1.1em }
+
+.prose blockquote {
+  margin: 1.8rem 0; padding: 1.3rem 1.5rem; background: var(--card);
+  border: 3px solid var(--ink); border-left: 8px solid var(--red);
+  box-shadow: 5px 5px 0 rgba(20,14,6,.3);
+}
+.prose blockquote p { margin: .5rem 0 }
+.prose blockquote > *:first-child { margin-top: 0 }
+.prose blockquote > *:last-child  { margin-bottom: 0 }
+/* Sanskrit verse treatment — Devanagari, hand-lettered weight */
+.prose blockquote p strong:lang(hi),
+.prose blockquote strong {
+  font-family: var(--deva); color: var(--ink); font-size: 1.1em; line-height: 1.9;
+  display: inline-block; font-weight: 400; -webkit-text-stroke: .3px var(--ink);
+}
+.prose hr {
+  border: 0; height: 6px; margin: 2.4rem auto; width: 72%;
+  background: repeating-linear-gradient(90deg,
+    var(--red) 0 16px, transparent 16px 22px, var(--ink) 22px 26px, transparent 26px 42px);
+}
+.prose img {
+  max-width: 100%; height: auto;
+  border: 3px solid var(--ink); box-shadow: 5px 5px 0 var(--ink);
+}
+
+/* ---------- Series nav --------------------------------------------------- */
+.series-nav {
+  display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center;
+  max-width: var(--measure); margin: 3rem auto 1rem; padding-top: 1.7rem;
+  border-top: 4px double var(--ink);
+}
+.sn-link { text-decoration: none; color: inherit; display: flex; flex-direction: column; gap: .2rem }
+.sn-next { text-align: right }
+.sn-dir {
+  font-size: .7rem; letter-spacing: .16em; text-transform: uppercase;
+  color: var(--red); font-weight: 700;
+}
+.sn-title { font-family: var(--display); font-size: 1.02rem; color: var(--ink) }
+.sn-link:hover .sn-title { color: var(--red) }
+.sn-empty { visibility: hidden }
+.sn-index {
+  text-decoration: none; font-family: var(--display); font-size: .88rem;
+  color: var(--ink); border: 3px solid var(--ink); padding: .4rem .8rem;
+  white-space: nowrap; box-shadow: 3px 3px 0 var(--ink);
+}
+.sn-index:hover { box-shadow: 1px 1px 0 var(--ink); color: var(--red) }
+
+/* ---------- Footer -------------------------------------------------------- */
+.site-footer {
+  margin-top: 3.5rem; padding: 2.4rem 0; border-top: 5px solid var(--ink);
+  text-align: center; box-shadow: 0 -3px 0 var(--red);
+}
+.foot-ornament { color: var(--red); font-size: 1.5rem; margin-bottom: .6rem }
+.foot-note { margin: 0 0 .5rem; color: var(--ink-soft); font-weight: 500; font-size: .95rem }
+.foot-links { margin: 0 0 .4rem; font-size: .85rem }
+.foot-links a { color: var(--red); text-decoration: none }
+.foot-links a:hover { color: var(--ink); text-decoration: underline }
+.foot-copy {
+  margin: 0; font-size: .76rem; color: var(--ink-soft); font-weight: 700;
+  letter-spacing: .08em;
+}
+
+/* ---------- Responsive ---------------------------------------------------- */
+@media (max-width: 640px) {
+  body { font-size: 1.02rem }
+  .wrap { width: min(100% - 2.6rem, 66rem) }
+  .post-list a { grid-template-columns: 1fr }
+  .pl-date { grid-row: auto; grid-column: 1 }
+  .series-nav { grid-template-columns: 1fr; text-align: center }
+  .sn-next, .sn-link { align-items: center; text-align: center }
+  .sn-empty { display: none }
+  /* the binding holes / tear need more room on narrow screens */
+  .sheet { inset: 96px 10px 20px 10px }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; scroll-behavior: auto !important }
+}
+
+@media print {
+  body { background: #fff }
+  body::before, .grain, .sheet, .site-header, .site-footer, .series-nav, .skip-link { display: none }
+  .wrap { width: 100% }
+}

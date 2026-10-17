@@ -1,0 +1,19 @@
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="{{ "/" | relURL }}">
+      <span class="brand-mark" aria-hidden="true"><img src="{{ "logo.png" | relURL }}" alt=""></span>
+      <span class="brand-text">
+        <span class="brand-name">{{ site.Title }}</span>
+        <span class="brand-sub">{{ site.Params.subtitle }}</span>
+      </span>
+    </a>
+    <nav class="site-nav" aria-label="Primary">
+      {{- $p := . -}}
+      {{- range site.Menus.main }}
+      {{- $active := or ($p.IsMenuCurrent "main" .) ($p.HasMenuCurrent "main" .) }}
+      {{- if not $active }}{{ $active = eq $p.RelPermalink .URL }}{{ end }}
+      <a href="{{ .URL }}"{{ if $active }} class="active" aria-current="page"{{ end }}>{{ .Name }}</a>
+      {{- end }}
+    </nav>
+  </div>
+</header>

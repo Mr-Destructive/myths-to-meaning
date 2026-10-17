@@ -1,0 +1,41 @@
+{{ define "main" }}
+<section class="hero">
+  <div class="wrap">
+    <h1 class="hero-title">{{ site.Title }}</h1>
+    <p class="hero-sub">{{ site.Params.description }}</p>
+  </div>
+</section>
+
+<section class="series-grid wrap">
+  {{- /* Cards are derived from the real section tree, not a hardcoded list.
+         Drop a new folder with an _index.md carrying weight/glyph/blurb and
+         its card appears here automatically. Counts use RegularPagesRecursive
+         because Navratri nests its posts under year folders. */}}
+  {{- range site.Sections.ByWeight }}
+  <a class="card" href="{{ .RelPermalink }}">
+    {{- with .Params.glyph }}<span class="card-glyph" aria-hidden="true">{{ . }}</span>{{ end }}
+    <h2 class="card-title">{{ .Title }}</h2>
+    {{- with .Params.blurb }}<p class="card-blurb">{{ . }}</p>{{ end }}
+    <span class="card-meta">{{ len .RegularPagesRecursive }} parts →</span>
+  </a>
+  {{- end }}
+</section>
+
+<section class="latest wrap">
+  <h2 class="section-heading"><span>Latest reflections</span></h2>
+  {{- $latest := first 6 (sort site.RegularPages "Date" "desc") }}
+  <ul class="post-list">
+    {{- range $latest }}
+    <li>
+      <a href="{{ .RelPermalink }}">
+        <span class="pl-series">{{ .Params.series_label }}</span>
+        <span class="pl-title">{{ .Title }}</span>
+        <time class="pl-date" datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "2 January 2006" }}</time>
+      </a>
+    </li>
+    {{- end }}
+  </ul>
+</section>
+
+{{- partial "top-tags.html" . }}
+{{ end }}

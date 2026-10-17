@@ -1,0 +1,29 @@
+{{- /* Prev / next navigation within the same series, ordered by verse or day. */ -}}
+{{- $s := .Params.series -}}
+{{- $siblings := where site.RegularPages "Params.series" $s -}}
+{{- $order := "Params.verse" -}}
+{{- if not .Params.verse }}{{ $order = "Params.day" }}{{ end }}
+{{- $sorted := sort $siblings $order "asc" -}}
+{{- $pos := 0 -}}
+{{- range $i, $p := $sorted -}}
+  {{- if eq $p.Permalink $.Permalink }}{{ $pos = $i }}{{ end -}}
+{{- end -}}
+{{- $prev := index $sorted (sub $pos 1) -}}
+{{- $next := index $sorted (add $pos 1) -}}
+{{- if or $prev $next }}
+<nav class="series-nav" aria-label="Series navigation">
+  {{- with $prev }}
+  <a class="sn-link sn-prev" href="{{ .RelPermalink }}">
+    <span class="sn-dir">← Previous</span>
+    <span class="sn-title">{{ .Params.part | default .Title }}</span>
+  </a>
+  {{- else }}<span class="sn-link sn-empty"></span>{{ end }}
+  <a class="sn-index" href="{{ printf "/%s/" $s | relURL }}">All {{ len $siblings }}</a>
+  {{- with $next }}
+  <a class="sn-link sn-next" href="{{ .RelPermalink }}">
+    <span class="sn-dir">Next →</span>
+    <span class="sn-title">{{ .Params.part | default .Title }}</span>
+  </a>
+  {{- else }}<span class="sn-link sn-empty"></span>{{ end }}
+</nav>
+{{- end -}}

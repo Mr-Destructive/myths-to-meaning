@@ -1,0 +1,20 @@
+{{ define "main" }}
+<section class="wrap listing">
+  <header class="listing-head">
+    <h1 class="listing-title">Tags</h1>
+    <p class="listing-intro prose">Secondary way in. Sections above are the primary structure; these cut across them.</p>
+  </header>
+  <ul class="tag-index">
+    {{- range .Data.Terms.Alphabetical }}
+    {{- /* filter on .Name (raw term, e.g. "verse-1"); .Page.Title is
+           title-cased by Hugo and would never match */}}
+    {{- if not (findRE `^(verse|day)-` (.Name | lower)) }}
+    <li><a class="tag-chip" href="{{ .Page.RelPermalink }}">
+      <span class="tag-name">{{ .Page.Title }}</span>
+      <span class="tag-count">{{ .Count }}</span>
+    </a></li>
+    {{- end }}
+    {{- end }}
+  </ul>
+</section>
+{{ end }}

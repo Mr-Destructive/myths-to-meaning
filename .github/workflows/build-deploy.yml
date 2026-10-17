@@ -1,0 +1,69 @@
+name: Build and Deploy
+
+# Pushes to the repo build the site and publish it to GitHub Pages. This is
+# also what makes the daily Substack sync visible: sync-substack.yml commits
+# new posts, that push lands here, and the site republishes automatically.
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; never cancel an in-flight deploy mid-publish.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Hugo
+        run: |
+          # Pinned to the exact version verified locally (v0.136.5) so CI output
+          # matches what has been tested. Extended build: harmless now that the
+          # theme is plain CSS, but it keeps the door open for SCSS later.
+          curl -sSL -o /tmp/hugo.tar.gz \
+            "https://github.com/gohugoio/hugo/releases/download/v0.136.5/hugo_extended_0.136.5_linux-amd64.tar.gz"
+          tar -xzf /tmp/hugo.tar.gz -C /tmp hugo
+          sudo install -m 755 /tmp/hugo /usr/local/bin/hugo
+          hugo version
+
+      - name: Build
+        # --cleanDestinationDir: Hugo does not prune files it no longer emits,
+        # so a stale page (from a renamed/removed section) would otherwise ride
+        # along in the artifact and deploy. Belt: public/ is gitignored, so the
+        # workspace starts clean.
+        run: hugo --gc --minify --cleanDestinationDir
+
+      - name: Verify no broken internal links
+        # Real script, not an inline heredoc: the checker must handle the
+        # unquoted href= that `--minify` produces, and it needs to be testable
+        # locally against both minified and plain output.
+        run: python3 scripts/check_links.py public
+
+      - name: Set up Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

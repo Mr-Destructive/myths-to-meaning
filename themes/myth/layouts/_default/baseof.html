@@ -1,0 +1,29 @@
+{{ printf "<!DOCTYPE html>" | safeHTML }}
+<html lang="{{ site.Language.LanguageCode | default "en-in" }}">
+<head>
+  {{- partial "head.html" . -}}
+</head>
+<body class="theme-paper">
+  {{- /* The torn edge is a real SVG displacement filter: feTurbulence feeds
+         feDisplacementMap, which physically pushes the sheet's border pixels
+         outward by ±17px. The sheet itself is an empty div carrying only
+         background gradients, so nothing readable is ever distorted. */}}
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+    <filter id="torn-paper" x="-7%" y="-7%" width="114%" height="114%" color-interpolation-filters="sRGB">
+      <feTurbulence type="fractalNoise" baseFrequency="0.016 0.02" numOctaves="5" seed="7" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="34" xChannelSelector="R" yChannelSelector="G"/>
+    </filter>
+  </defs></svg>
+  <div class="sheet" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  {{- partial "header.html" . -}}
+
+  <main id="main" class="site-main">
+    {{- block "main" . }}{{ end -}}
+  </main>
+
+  {{- partial "footer.html" . -}}
+</body>
+</html>

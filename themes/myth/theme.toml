@@ -1,0 +1,4 @@
+name = "Myth"
+license = "MIT"
+description = "Indian scripture-inspired theme — aged paper, saffron and vermilion, Devanagari-first typography."
+min_version = "0.128.0"

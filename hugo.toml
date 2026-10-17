@@ -1,0 +1,48 @@
+baseURL = "https://mythstomeaning.meetgor.com/"
+languageCode = "en-in"
+title = "Mythology to Meaning"
+theme = "myth"
+hasCJKLanguage = false
+enableEmoji = true
+summaryLength = 40
+pagination.pagerSize = 12
+
+[params]
+  description = "A journey through Hindu mythology and literature, one verse at a time."
+  author = "Meet"
+  subtitle = "Ancient stories, read for what they still mean"
+  footerNote = "Ported with reverence from Mythology to Meaning."
+
+  [params.social]
+    substack = "https://mythstomeaning.substack.com/"
+
+[menus]
+  [[menus.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menus.main]]
+    name = "Shiv Tandav"
+    url = "/shiv-tandav/"
+    weight = 2
+  [[menus.main]]
+    name = "Mahishasura Mardini"
+    url = "/mahishasura-mardini/"
+    weight = 3
+  [[menus.main]]
+    name = "Navratri"
+    url = "/navratri/"
+    weight = 4
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[markup.goldmark.extensions.typographer]
+  disable = false
+
+[outputs]
+  home = ["html", "rss"]
+  section = ["html", "rss"]
+
+[imaging]
+  resampleFilter = "Lanczos"

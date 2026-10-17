@@ -1,0 +1,26 @@
+{{- /* Secondary browse layer. Sections stay primary; these chips cut across
+       them. Ordinals (verse-14, day-6) are dropped because nobody browses by
+       them, and so is any tag covering every page here (it would filter to
+       everything and mean nothing). */ -}}
+{{- $pages := .RegularPagesRecursive -}}
+{{- $total := len $pages -}}
+{{- $counts := newScratch -}}
+{{- range $pages -}}
+  {{- range .Params.tags -}}
+    {{- $counts.Set . (add ($counts.Get . | default 0) 1) -}}
+  {{- end -}}
+{{- end -}}
+{{- $chips := slice -}}
+{{- range $tag, $n := $counts.Values -}}
+  {{- if and (not (findRE `^(verse|day)-` $tag)) (lt $n $total) -}}
+    {{- $chips = $chips | append (dict "tag" $tag "count" $n) -}}
+  {{- end -}}
+{{- end -}}
+{{- with $chips }}
+<nav class="tag-bar" aria-label="Filter by tag">
+  <span class="tag-bar-label">Filter</span>
+  {{- range sort . "count" "desc" }}
+  <a class="tag-chip" href="{{ printf "/tags/%s/" .tag | relURL }}">{{ .tag }}<span class="tag-count">{{ .count }}</span></a>
+  {{- end }}
+</nav>
+{{- end -}}

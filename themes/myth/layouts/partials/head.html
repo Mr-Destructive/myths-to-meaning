@@ -1,0 +1,83 @@
+{{- $title := .Title -}}
+{{- if .IsHome }}{{ $title = site.Title }}{{ else if $title }}{{ $title = printf "%s · %s" $title site.Title }}{{ end -}}
+{{- $desc := "" -}}
+{{- with or .Description .Params.subtitle site.Params.description }}{{ $desc = . }}{{ end -}}
+{{- $img := "" -}}
+{{- with .Params.cover_image }}{{ $img = . }}{{ else }}{{ $img = "og-logo.png" | absURL }}{{ end -}}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ $title }}</title>
+{{- with $desc }}
+<meta name="description" content="{{ . }}">
+{{- end }}
+<meta name="author" content="{{ site.Params.author }}">
+<meta name="theme-color" content="#cfb789">
+<link rel="canonical" href="{{ .Permalink }}">
+
+{{- /* Favicon set, generated from the publication's own logo PNG */}}
+<link rel="icon" href="{{ "favicon-32x32.png" | relURL }}" sizes="32x32" type="image/png">
+<link rel="icon" href="{{ "favicon-16x16.png" | relURL }}" sizes="16x16" type="image/png">
+<link rel="shortcut icon" href="{{ "favicon.ico" | relURL }}">
+<link rel="apple-touch-icon" href="{{ "favicon-180x180.png" | relURL }}" sizes="180x180">
+
+<meta property="og:type" content="{{ if .IsPage }}article{{ else }}website{{ end }}">
+<meta property="og:title" content="{{ .Title | default site.Title }}">
+{{- with $desc }}
+<meta property="og:description" content="{{ . }}">
+{{- end }}
+<meta property="og:url" content="{{ .Permalink }}">
+<meta property="og:site_name" content="{{ site.Title }}">
+<meta property="og:image" content="{{ $img }}">
+<meta property="og:locale" content="en_IN">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{ .Title | default site.Title }}">
+{{- with $desc }}
+<meta name="twitter:description" content="{{ . }}">
+{{- end }}
+<meta name="twitter:image" content="{{ $img }}">
+
+{{- /* Structured data: WebSite for the whole site, BlogPosting per article */}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "name": {{ site.Title | jsonify }},
+      "url": {{ site.BaseURL | jsonify }},
+      "description": {{ site.Params.description | jsonify }},
+      "inLanguage": "en-IN",
+      "publisher": {
+        "@type": "Person",
+        "name": {{ site.Params.author | jsonify }}
+      }
+    }{{ if .IsPage }},
+    {
+      "@type": "BlogPosting",
+      "headline": {{ .Title | jsonify }},
+      {{- with .Params.subtitle }}"description": {{ . | jsonify }},{{ end }}
+      "datePublished": {{ .Date.Format "2006-01-02T15:04:05Z07:00" | jsonify }},
+      "url": {{ .Permalink | jsonify }},
+      "image": {{ $img | jsonify }},
+      "inLanguage": "en-IN",
+      "author": { "@type": "Person", "name": {{ site.Params.author | jsonify }} },
+      "publisher": { "@type": "Person", "name": {{ site.Params.author | jsonify }} },
+      "mainEntityOfPage": { "@type": "WebPage", "@id": {{ .Permalink | jsonify }} }{{ with .Params.series_label }},
+      "articleSection": {{ . | jsonify }}{{ end }}
+    }{{ end }}
+  ]
+}
+</script>
+
+{{- /* Devanagari + display pairing. Tiro carries Devanagari and Latin body,
+      Yatra One is the bold painted Pattachitra display face, Spectral reads. */}}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Tiro+Devanagari+Hindi:ital@0;1&family=Yatra+One&display=swap" rel="stylesheet">
+
+{{- $css := resources.Get "css/main.css" -}}
+{{- if $css -}}
+  {{- $min := $css | minify | fingerprint -}}
+<link rel="stylesheet" href="{{ $min.RelPermalink }}" integrity="{{ $min.Data.Integrity }}" crossorigin="anonymous">
+{{- end -}}
