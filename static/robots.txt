@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://mythstomeaning.meetgor.com/sitemap.xml
+Sitemap: https://myths-to-meaning.meetgor.com/sitemap.xml

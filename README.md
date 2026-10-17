@@ -1,7 +1,7 @@
 # Mythology to Meaning
 
 Static port of [mythstomeaning.substack.com](https://mythstomeaning.substack.com/) →
-**mythstomeaning.meetgor.com**, built with Hugo.
+**myths-to-meaning.meetgor.com**, built with Hugo.
 
 ## Content inventory
 
@@ -75,7 +75,7 @@ component rules into `themes/myth/assets/css/main.css`.
 
 ## Deploy
 
-`baseURL` in `hugo.toml` is already set to `https://mythstomeaning.meetgor.com/`.
+`baseURL` in `hugo.toml` is already set to `https://myths-to-meaning.meetgor.com/`.
 Publish the `public/` directory to any static host (Netlify, Vercel, GitHub Pages,
 or the same pipeline you use for meetgor.com). Add a CNAME/DNS record pointing
-`mythstomeaning.meetgor.com` at the host.
+`myths-to-meaning.meetgor.com` at the host.

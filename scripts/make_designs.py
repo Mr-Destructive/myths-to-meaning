@@ -878,7 +878,7 @@ box-shadow:0 2px 0 rgba(110,20,20,.08);transition:transform .2s,border-color .2s
 .note{{text-align:center;margin-top:2.5rem;font-size:.9rem;color:#6b4a2e;font-style:italic}}
 </style></head><body><div class="wrap">
 <h1>Mythology to Meaning</h1>
-<p class="sub">{len(DESIGNS)} design concepts for <b>mythstomeaning.meetgor.com</b> — each shown with real verse content. Designs 6–8 are the pattachitra language on real torn / palm-leaf / charred material.</p>
+<p class="sub">{len(DESIGNS)} design concepts for <b>myths-to-meaning.meetgor.com</b> — each shown with real verse content. Designs 6–8 are the pattachitra language on real torn / palm-leaf / charred material.</p>
 <div class="grid">{cards}</div>
 <p class="note">Every preview is a self-contained HTML file — open them side by side to compare.</p>
 </div></body></html>"""
