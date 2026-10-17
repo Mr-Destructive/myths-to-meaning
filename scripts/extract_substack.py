@@ -14,6 +14,8 @@ import re
 import subprocess
 import sys
 import time
+import urllib.error
+import urllib.parse
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
@@ -25,6 +27,24 @@ OUT_ROOT = os.path.join(BASE, "content")
 
 UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+
+HEADERS = {
+    "User-Agent": UA,
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+# Substack's edge 403s requests from cloud-provider IP ranges (GitHub Actions
+# runners live in exactly such a range) no matter how browser-like the headers
+# are. When direct fetch is blocked we fall back in order to: curl_cffi, which
+# replays Chrome's exact TLS + HTTP/2 fingerprint; then public CORS relays
+# that fetch server-side from a different IP pool. Everything crossing these
+# hops is a public feed and public post pages -- no credentials, no private
+# data.
+RELAYS = (
+    "https://api.allorigins.win/raw?url={q}",
+    "https://api.codetabs.com/v1/proxy?quest={q}",
+)
 
 # Substack chrome we never want in the exported markdown.
 BOILERPLATE_SELECTORS = [
@@ -41,16 +61,74 @@ BOILERPLATE_SELECTORS = [
 ]
 
 
+def _direct(url, timeout):
+    req = urllib.request.Request(url, headers=HEADERS)
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read().decode("utf-8", "replace")
+
+
+def _curl_cffi(url, timeout):
+    from curl_cffi import requests as cffi  # optional dependency
+
+    r = cffi.get(url, impersonate="chrome", timeout=timeout)
+    r.raise_for_status()
+    return r.text
+
+
+def _relay(url, template, timeout):
+    proxied = template.format(q=urllib.parse.quote(url, safe=""))
+    req = urllib.request.Request(proxied, headers={"User-Agent": UA})
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        body = r.read().decode("utf-8", "replace")
+    if not body.strip():
+        raise RuntimeError("relay returned empty body")
+    return body
+
+
+def _note(msg):
+    print(f"[fetch] {msg}", file=sys.stderr, flush=True)
+
+
 def fetch(url, retries=4, timeout=45):
+    """Fetch a URL, layered: direct -> curl_cffi -> public relays.
+
+    Each layer logs why it gave up, so a CI log shows exactly which path
+    served the bytes. Retry applies only to flaky errors (timeouts, 5xx);
+    a 403/429 is a policy block and retrying from the same IP is wasted.
+    """
     last = None
     for attempt in range(retries):
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                return r.read().decode("utf-8", "replace")
+            return _direct(url, timeout)
+        except urllib.error.HTTPError as e:
+            last = e
+            _note(f"direct: HTTP {e.code} for {url}")
+            if e.code in (401, 403, 429):
+                break
+            time.sleep(1.5 * (attempt + 1))
         except Exception as e:  # noqa: BLE001
             last = e
+            _note(f"direct: {e}")
             time.sleep(1.5 * (attempt + 1))
+
+    try:
+        body = _curl_cffi(url, timeout)
+        _note("curl_cffi (Chrome TLS fingerprint) succeeded")
+        return body
+    except Exception as e:  # noqa: BLE001
+        _note(f"curl_cffi unavailable/failed: {e}")
+        last = e
+
+    for template in RELAYS:
+        host = template.split("/")[2]
+        try:
+            body = _relay(url, template, timeout)
+            _note(f"relay {host} succeeded")
+            return body
+        except Exception as e:  # noqa: BLE001
+            _note(f"relay {host} failed: {e}")
+            last = e
+
     raise RuntimeError(f"failed {url}: {last}")
 
 

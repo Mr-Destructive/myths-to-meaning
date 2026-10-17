@@ -26,32 +26,18 @@ import re
 import subprocess
 import sys
 import time
-import urllib.request
 from xml.etree import ElementTree as ET
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from extract_substack import classify, emit, get_post, html_to_markdown  # noqa: E402
+from extract_substack import (  # noqa: E402
+    classify, emit, fetch, get_post, html_to_markdown,
+)
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONTENT = os.path.join(BASE, "content")
 FEED = "https://mythstomeaning.substack.com/feed"
-UA = ("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
 
 NS = {"content": "http://purl.org/rss/1.0/modules/content/"}
-
-
-def fetch(url, retries=4, timeout=45):
-    last = None
-    for attempt in range(retries):
-        try:
-            req = urllib.request.Request(url, headers={"User-Agent": UA})
-            with urllib.request.urlopen(req, timeout=timeout) as r:
-                return r.read().decode("utf-8", "replace")
-        except Exception as e:  # noqa: BLE001
-            last = e
-            time.sleep(2 * (attempt + 1))
-    raise RuntimeError(f"failed {url}: {last}")
 
 
 def feed_slugs():

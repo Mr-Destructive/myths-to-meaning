@@ -39,10 +39,16 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y -qq pandoc
-          pip install beautifulsoup4
+          # curl_cffi: Chrome-TLS-impersonating fetch, used as the second
+          # layer when Substack's edge 403s the runner's IP on the first.
+          pip install beautifulsoup4 curl_cffi
 
       - name: Check for new posts
         id: sync
+        # shell: bash -> bash -eo pipefail. Without it, `python | tee` reports
+        # tee's exit code, a crashing sync looks green, and the run silently
+        # publishes nothing (observed in the wild -- this is not theoretical).
+        shell: bash
         run: |
           python3 scripts/sync_rss.py | tee sync.log
           # Surface the result in the run summary for humans.
