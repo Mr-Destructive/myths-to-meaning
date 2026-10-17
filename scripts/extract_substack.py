@@ -67,6 +67,75 @@ def _direct(url, timeout):
         return r.read().decode("utf-8", "replace")
 
 
+def _jina_via_urllib(url, respond_with, timeout):
+    headers = {"User-Agent": UA}
+    if respond_with:
+        headers["x-respond-with"] = respond_with
+    req = urllib.request.Request(f"https://r.jina.ai/{url}", headers=headers)
+    with urllib.request.urlopen(req, timeout=timeout) as r:
+        return r.read().decode("utf-8", "replace")
+
+
+def _jina_via_curl(url, respond_with, timeout):
+    cmd = ["curl", "-sS", "--max-time", str(timeout)]
+    if respond_with:
+        cmd += ["-H", f"x-respond-with: {respond_with}"]
+    cmd.append(f"https://r.jina.ai/{url}")
+    p = subprocess.run(cmd, capture_output=True, text=True,
+                       timeout=timeout + 15)
+    if p.returncode != 0:
+        raise RuntimeError(f"curl exit {p.returncode}: "
+                           f"{p.stderr.strip()[:200]}")
+    return p.stdout
+
+
+def jina_fetch(url, respond_with=None, timeout=90):
+    """Fetch through r.jina.ai, which has none of the IP problems above.
+
+    Two modes, both verified against this publication:
+    - respond_with="html": returns the raw document. Post pages keep their
+      <script id="preloads-json"> intact, so get_post works unchanged.
+    - default (markdown): renders the page. An RSS feed LOSES its <item>
+      tags this way, but every post link survives in order, which is enough
+      for slug discovery when the raw XML is unreachable.
+
+    Jina fingerprints its clients: the identical request gets HTTP 403 through
+    python-urllib and HTTP 200 through curl from the same IP (verified), so we
+    speak through curl_cffi (Chrome TLS, present in CI) or the curl binary
+    (present everywhere) before ever trying urllib.
+    """
+    errors = []
+    try:
+        from curl_cffi import requests as cffi  # optional dependency
+        kw = {"headers": {"x-respond-with": respond_with}} if respond_with else {}
+        r = cffi.get(f"https://r.jina.ai/{url}", impersonate="chrome",
+                     timeout=timeout, **kw)
+        r.raise_for_status()
+        if r.text.strip():
+            return r.text
+        errors.append("curl_cffi: empty body")
+    except Exception as e:  # noqa: BLE001
+        errors.append(f"curl_cffi: {e}")
+
+    try:
+        body = _jina_via_curl(url, respond_with, timeout)
+        if body.strip():
+            return body
+        errors.append("curl: empty body")
+    except Exception as e:  # noqa: BLE001
+        errors.append(f"curl: {e}")
+
+    try:
+        body = _jina_via_urllib(url, respond_with, timeout)
+        if body.strip():
+            return body
+        errors.append("urllib: empty body")
+    except Exception as e:  # noqa: BLE001
+        errors.append(f"urllib: {e}")
+
+    raise RuntimeError(f"jina unreachable ({'; '.join(errors)})")
+
+
 def _curl_cffi(url, timeout):
     from curl_cffi import requests as cffi  # optional dependency
 
@@ -89,12 +158,15 @@ def _note(msg):
     print(f"[fetch] {msg}", file=sys.stderr, flush=True)
 
 
-def fetch(url, retries=4, timeout=45):
-    """Fetch a URL, layered: direct -> curl_cffi -> public relays.
+def fetch(url, retries=4, timeout=45, jina_html=False):
+    """Fetch a URL, layered: direct -> curl_cffi -> jina -> public relays.
 
     Each layer logs why it gave up, so a CI log shows exactly which path
     served the bytes. Retry applies only to flaky errors (timeouts, 5xx);
     a 403/429 is a policy block and retrying from the same IP is wasted.
+
+    jina_html=True adds the jina raw-HTML layer before the relays; use it
+    for HTML documents (post pages), never for XML (jina renders feeds).
     """
     last = None
     for attempt in range(retries):
@@ -119,6 +191,15 @@ def fetch(url, retries=4, timeout=45):
         _note(f"curl_cffi unavailable/failed: {e}")
         last = e
 
+    if jina_html:
+        try:
+            body = jina_fetch(url, "html", timeout)
+            _note("jina raw-HTML relay succeeded")
+            return body
+        except Exception as e:  # noqa: BLE001
+            _note(f"jina raw-HTML relay failed: {e}")
+            last = e
+
     for template in RELAYS:
         host = template.split("/")[2]
         try:
@@ -135,7 +216,9 @@ def fetch(url, retries=4, timeout=45):
 def get_post(slug):
     """Fetch a post page and pull the full post object out of preloads-json."""
     url = f"https://mythstomeaning.substack.com/p/{slug}"
-    html = fetch(url)
+    # jina_html=True: on blocked IPs the raw-HTML relay preserves the
+    # preloads-json script byte-for-byte (verified), so extraction is identical.
+    html = fetch(url, jina_html=True)
     m = re.search(r'<script[^>]*id="preloads-json"[^>]*>(.*?)</script>', html, re.S)
     if not m:
         raise RuntimeError(f"no preloads-json for {slug}")

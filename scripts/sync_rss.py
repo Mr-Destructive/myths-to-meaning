@@ -30,7 +30,7 @@ from xml.etree import ElementTree as ET
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from extract_substack import (  # noqa: E402
-    classify, emit, fetch, get_post, html_to_markdown,
+    classify, emit, fetch, get_post, html_to_markdown, jina_fetch,
 )
 
 BASE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -41,8 +41,29 @@ NS = {"content": "http://purl.org/rss/1.0/modules/content/"}
 
 
 def feed_slugs():
-    """-> [(slug, title)] newest first, straight from the RSS feed."""
-    root = ET.fromstring(fetch(FEED))
+    """-> [(slug, title)] newest first, straight from the RSS feed.
+
+    If the raw XML is unreachable (Substack 403s cloud-provider IPs and some
+    relays mangle XML), fall back to jina's markdown rendering of the same
+    feed: it has no titles, but every post link survives in order, and
+    titles are cosmetic here -- get_post supplies the real ones for anything
+    actually new.
+    """
+    try:
+        root = ET.fromstring(fetch(FEED))
+    except Exception as e:  # noqa: BLE001
+        print(f"  ! raw feed unavailable ({e}); discovering via jina",
+              file=sys.stderr, flush=True)
+        md = jina_fetch(FEED)
+        slugs = []
+        for s in re.findall(r"substack\.com/p/([A-Za-z0-9-]+)", md):
+            if s not in slugs:
+                slugs.append(s)
+        if not slugs:
+            raise RuntimeError("jina fallback returned no post links")
+        print(f"  (jina discovery: {len(slugs)} slugs)", file=sys.stderr)
+        return [(s, "") for s in slugs]
+
     out = []
     for item in root.iter("item"):
         link = (item.findtext("link") or "").strip()
