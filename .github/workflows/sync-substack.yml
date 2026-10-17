@@ -10,6 +10,10 @@ on:
 
 permissions:
   contents: write
+  # Only the publish job uses these two; declared at the top because a
+  # workflow_call cannot be granted more than the caller's own ceiling.
+  pages: write
+  id-token: write
 
 concurrency:
   group: sync-substack
@@ -22,6 +26,10 @@ jobs:
     # Anything beyond this is a hung network call; better to kill it and let
     # tomorrow's cron retry than to burn a runner.
     timeout-minutes: 20
+    permissions:
+      contents: write
+    outputs:
+      added: ${{ steps.sync.outputs.added }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -51,6 +59,11 @@ jobs:
         shell: bash
         run: |
           python3 scripts/sync_rss.py | tee sync.log
+          # Tell the publish job whether anything landed. Set from the working
+          # tree, before the commit step, so it reflects what was just emitted.
+          if [ -n "$(git status --porcelain -- content/)" ]; then
+            echo "added=true" >> "$GITHUB_OUTPUT"
+          fi
           # Surface the result in the run summary for humans.
           if [ -f data/sync-report.json ]; then
             {
@@ -74,12 +87,26 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # No [skip ci] here on purpose: this push must reach the
-          # build-deploy workflow, otherwise a newly synced post would land in
-          # the repo but never publish. build-deploy does not push back, so
-          # there is no loop.
+          # No [skip ci]: the commit stays normal for history. Note that this
+          # push (made with the default GITHUB_TOKEN) can never trigger the
+          # build workflow itself -- GitHub's recursion guard -- which is what
+          # the publish job below is for.
           COUNT=$(git status --porcelain -- content/ | wc -l)
           SECTIONS=$(python3 -c "import json;print(', '.join(json.load(open('data/sync-report.json'))['sections']))" 2>/dev/null || echo "content")
           git add content/
           git commit -m "content: sync $COUNT new post(s) from Substack ($SECTIONS)"
           git push
+
+  publish:
+    # The freshly committed post only exists on master AFTER this run started,
+    # and the bot's own push cannot trigger the build workflow (GitHub's
+    # recursion guard). So when -- and only when -- something was added, call
+    # build-deploy directly. It checks out the branch tip, so it sees the new
+    # commit. No PAT or extra secret needed.
+    needs: sync
+    if: needs.sync.outputs.added == 'true'
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: ./.github/workflows/build-deploy.yml

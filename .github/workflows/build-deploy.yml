@@ -7,6 +7,11 @@ on:
   push:
     branches: [main, master]
   workflow_dispatch:
+  # sync-substack.yml calls this workflow directly: pushes made with the
+  # default GITHUB_TOKEN never trigger other workflows (GitHub's recursion
+  # guard), so without this entry a freshly synced post would sit on master
+  # unpublished forever.
+  workflow_call:
 
 permissions:
   contents: read
@@ -24,6 +29,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Branch tip, not the triggering SHA: when the sync workflow calls
+          # this one, the newly committed post lives in a commit NEWER than
+          # the caller's head_sha. concurrency: pages serializes deploys, so
+          # always building the tip converges on the latest master.
+          ref: ${{ github.ref_name }}
 
       - name: Install Hugo
         run: |
