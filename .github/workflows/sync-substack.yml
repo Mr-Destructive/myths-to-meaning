@@ -18,6 +18,10 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    # Hard cap: apt + pandoc + a handful of fetches normally finish in ~2 min.
+    # Anything beyond this is a hung network call; better to kill it and let
+    # tomorrow's cron retry than to burn a runner.
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
